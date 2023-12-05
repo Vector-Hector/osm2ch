@@ -345,6 +345,16 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 	// @todo: work with maneuvers (restrictions)
 	fmt.Printf("Working with maneuvers (restrictions)...")
 	st = time.Now()
+
+	// create index by SourceOSMWayID -> edge index
+	edgeIndexBySourceWayID := make(map[osm.WayID][]int)
+	for i, edge := range expandedEdges {
+		edgeIndexBySourceWayID[edge.SourceOSMWayID] = append(edgeIndexBySourceWayID[edge.SourceOSMWayID], i)
+	}
+
+	// slice of edges which should be deleted
+	toDelete := make([]bool, len(expandedEdges))
+
 	// Handling restrictions of "no" type
 	for i, k := range restrictions {
 		switch i {
@@ -370,14 +380,12 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 						continue
 					}
 					// Delete restricted expanded edge
-					{
-						temp := expandedEdges[:0]
-						for _, expEdge := range expandedEdges {
-							if expEdge.SourceOSMWayID != fromOSMWayID || expEdge.TargetOSMWayID != toOSMWayID {
-								temp = append(temp, expEdge)
-							}
+					edgeIndices := edgeIndexBySourceWayID[fromOSMWayID]
+
+					for _, edgeIndex := range edgeIndices {
+						if expandedEdges[edgeIndex].TargetOSMWayID == toOSMWayID {
+							toDelete[edgeIndex] = true
 						}
-						expandedEdges = temp
 					}
 				}
 			}
@@ -412,14 +420,15 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 						continue
 					}
 					rvertexVia := v[n].ID
-					{
-						temp := expandedEdges[:0]
-						for _, expEdge := range expandedEdges {
-							if !(expEdge.SourceOSMWayID == fromOSMWayID && expEdge.TargetOSMWayID != toOSMWayID && expEdge.SourceComponent.TargetNodeID == osm.NodeID(rvertexVia)) {
-								temp = append(temp, expEdge)
-							}
+
+					// Delete relevant expanded edges
+					edgeIndices := edgeIndexBySourceWayID[fromOSMWayID]
+
+					for _, edgeIndex := range edgeIndices {
+						expEdge := expandedEdges[edgeIndex]
+						if expEdge.TargetOSMWayID != toOSMWayID && expEdge.SourceComponent.TargetNodeID == osm.NodeID(rvertexVia) {
+							toDelete[edgeIndex] = true
 						}
-						expandedEdges = temp
 					}
 				}
 			}
@@ -428,7 +437,17 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 			// @todo: need to think about U-turns: "no_u_turn"
 			break
 		}
+	}
 
+	// Apply deletions
+	{
+		temp := expandedEdges[:0]
+		for i, expEdge := range expandedEdges {
+			if !toDelete[i] {
+				temp = append(temp, expEdge)
+			}
+		}
+		expandedEdges = temp
 	}
 
 	fmt.Printf("Done in %v\n", time.Since(st))
