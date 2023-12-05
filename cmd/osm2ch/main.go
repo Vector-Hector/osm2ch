@@ -108,8 +108,8 @@ func main() {
 			return
 		}
 		cost := edge.CostMeters
-		if strings.ToLower(*units) == "m" {
-			cost *= 1000.0
+		if strings.ToLower(*units) != "m" {
+			cost /= 1000.0
 		}
 		err = graph.AddEdge(source, target, cost)
 		if err != nil {

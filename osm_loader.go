@@ -241,7 +241,7 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 				if node.useCount > 1 {
 					totalEdgesNum++
 					onewayEdges++
-					cost := getSphericalLength(geometry)
+					cost := getSphericalLength(geometry) * 1000.0 // meters
 					edges = append(edges, Edge{
 						ID:           EdgeID(totalEdgesNum),
 						WayID:        way.ID,
