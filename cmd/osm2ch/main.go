@@ -146,7 +146,7 @@ func main() {
 			fmt.Sprintf("%d", edge.SourceOSMWayID),
 			fmt.Sprintf("%d", edge.TargetOSMWayID),
 			fmt.Sprintf("%d", edge.SourceComponent.SourceNodeID), fmt.Sprintf("%d", edge.SourceComponent.TargetNodeID),
-			fmt.Sprintf("%d", edge.TargeComponent.SourceNodeID), fmt.Sprintf("%d", edge.TargeComponent.TargetNodeID),
+			fmt.Sprintf("%d", edge.TargetComponent.SourceNodeID), fmt.Sprintf("%d", edge.TargetComponent.TargetNodeID),
 		})
 
 		if err != nil {

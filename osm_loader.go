@@ -250,6 +250,7 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 						CostMeters:   cost,
 						Geom:         copyLine(geometry),
 						WasOneway:    way.Oneway,
+						Tags:         way.TagMap,
 					})
 					if !way.Oneway {
 						totalEdgesNum++
@@ -262,6 +263,7 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 							CostMeters:   cost,
 							Geom:         reverseLine(geometry),
 							WasOneway:    false,
+							Tags:         way.TagMap,
 						})
 					}
 					source = wayNode.ID
@@ -324,13 +326,17 @@ func ImportFromOSMFile(fileName string, cfg *OsmConfiguration) ([]ExpandedEdge, 
 				Target:         edgeAsToVertex.ID,
 				SourceOSMWayID: edgeAsFromVertex.WayID,
 				TargetOSMWayID: edgeAsToVertex.WayID,
-				SourceComponent: expandedEdgeComponent{
+				SourceComponent: ExpandedEdgeComponent{
 					SourceNodeID: edgeAsFromVertex.SourceNodeID,
 					TargetNodeID: edgeAsFromVertex.TargetNodeID,
+					Tags:         edgeAsFromVertex.Tags,
+					CostMeters:   costMetersFromVertex / 2.0,
 				},
-				TargeComponent: expandedEdgeComponent{
+				TargetComponent: ExpandedEdgeComponent{
 					SourceNodeID: edgeAsToVertex.SourceNodeID,
 					TargetNodeID: edgeAsToVertex.TargetNodeID,
+					Tags:         edgeAsToVertex.Tags,
+					CostMeters:   costMetersToVertex / 2.0,
 				},
 				CostMeters: (costMetersFromVertex + costMetersToVertex) / 2.0,
 				WasOneway:  edgeAsFromVertex.WasOneway,

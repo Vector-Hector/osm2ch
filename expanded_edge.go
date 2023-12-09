@@ -9,18 +9,20 @@ type ExpandedEdge struct {
 	Target          EdgeID
 	SourceOSMWayID  osm.WayID
 	TargetOSMWayID  osm.WayID
-	SourceComponent expandedEdgeComponent
-	TargeComponent  expandedEdgeComponent
+	SourceComponent ExpandedEdgeComponent
+	TargetComponent ExpandedEdgeComponent
 	WasOneway       bool
 	CostMeters      float64
 	/* CostSeconds  float64 */ //@todo: consider cost customization
 	Geom                       []GeoPoint
 }
 
-// expandedEdgeComponent represents former Way
-type expandedEdgeComponent struct {
+// ExpandedEdgeComponent represents former Way
+type ExpandedEdgeComponent struct {
 	SourceNodeID osm.NodeID
 	TargetNodeID osm.NodeID
+	Tags         osm.Tags
+	CostMeters   float64
 }
 
 // restrictionComponent represents member of restriction relation. Could be either way or node.

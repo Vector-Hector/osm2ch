@@ -15,4 +15,5 @@ type Edge struct {
 	CostMeters   float64
 	/* CostSeconds  float64 */ //@todo: consider cost customization
 	Geom                       []GeoPoint
+	Tags                       osm.Tags
 }
